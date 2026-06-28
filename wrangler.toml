@@ -1,0 +1,125 @@
+name = "metamesh-gateway"
+main = "packages/gateway/src/index.js"
+compatibility_date = "2024-06-14"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "metamesh-catalog"
+database_id = "f9d503dc-708e-4d7a-a502-6b7952611013"
+migrations_dir = "shared/migrations"
+
+# KV Namespaces
+[[kv_namespaces]]
+binding = "CACHE"
+id = "e3fb217363a04f53903b14b4cb503034"
+
+[[kv_namespaces]]
+binding = "CONFIG_CACHE"
+id = "38d187a2778f4fc8897e509c1ac62cdc"
+
+# R2 Buckets (create via dashboard if wrangler r2 is unavailable)
+[[r2_buckets]]
+binding = "STORAGE"
+bucket_name = "metamesh-wasm"
+
+[[r2_buckets]]
+binding = "REGISTRY_MIRROR"
+bucket_name = "metamesh-registry-mirror"
+
+[[r2_buckets]]
+binding = "ANALYTICS_STORAGE"
+bucket_name = "metamesh-analytics"
+
+# Analytics Engine (re-enable in dashboard)
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "metamesh_usage"
+
+# Queue per compilazione WASM
+[[queues.producers]]
+binding = "COMPILATION_QUEUE"
+queue = "wasm-compilation"
+
+# Environment Variables
+[vars]
+ENVIRONMENT = "development"
+JWT_SECRET = "dev-secret-change-in-production"
+X402_CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"
+
+# Secrets (da impostare con wrangler secret put)
+# STRIPE_SECRET_KEY
+# TELEGRAM_BOT_TOKEN
+# TELEGRAM_CHAT_ID
+# SENTRY_DSN
+
+[env.staging]
+name = "metamesh-gateway-staging"
+routes = [{ pattern = "staging-api.metamesh-uga.dev", custom_domain = true }]
+[env.staging.vars]
+ENVIRONMENT = "staging"
+
+[env.production]
+name = "metamesh-gateway-prod"
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "metamesh-catalog"
+database_id = "f9d503dc-708e-4d7a-a502-6b7952611013"
+
+[[env.production.kv_namespaces]]
+binding = "CACHE"
+id = "e3fb217363a04f53903b14b4cb503034"
+
+[[env.production.kv_namespaces]]
+binding = "CONFIG_CACHE"
+id = "38d187a2778f4fc8897e509c1ac62cdc"
+
+[[env.production.queues.producers]]
+binding = "COMPILATION_QUEUE"
+queue = "wasm-compilation"
+
+[[env.production.r2_buckets]]
+binding = "STORAGE"
+bucket_name = "metamesh-wasm"
+
+[[env.production.r2_buckets]]
+binding = "REGISTRY_MIRROR"
+bucket_name = "metamesh-registry-mirror"
+
+[[env.production.r2_buckets]]
+binding = "ANALYTICS_STORAGE"
+bucket_name = "metamesh-analytics"
+
+[[env.production.analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "metamesh_usage"
+
+[env.production.vars]
+ENVIRONMENT = "production"
+X402_CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"
+# x402 payments: set X402_ENABLED="true" and X402_PAY_TO="0xYourWallet" to activate
+X402_ENABLED = "false"
+X402_PAY_TO = ""
+X402_NETWORK = "base"
+USDC_CONTRACT = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+X402_FACILITATOR_URL = "https://x402.org/facilitator"
+# Freemium billing. When BILLING_ENABLED="true", every identity (authenticated
+# agent, or anonymous client fingerprinted by IP+UA) gets FREE_MONTHLY_CALLS free
+# tool calls per calendar month. After the quota: agents are charged from prepaid
+# balance; anonymous callers get HTTP 402 (register+top up via Stripe, or pay x402).
+# Tool discovery (tools/list, search, native metamesh.* tools) is always free.
+# Set BILLING_ENABLED="false" to make everything free (dev mode).
+BILLING_ENABLED = "true"
+FREE_MONTHLY_CALLS = "100"
+PUBLIC_DASHBOARD_URL = "https://dashboard.metamesh-uga.dev"
+# Secrets (set via: wrangler secret put <NAME> --env production):
+#   STRIPE_SECRET_KEY      (sk_live_... or sk_test_...)
+#   STRIPE_WEBHOOK_SECRET  (whsec_...)
+
+# Cron Triggers for 7-day monitoring
+[triggers]
+crons = ["0 */6 * * *", "0 2 * * *"]
+
+[env.production.triggers]
+crons = ["0 */6 * * *", "0 2 * * *"]

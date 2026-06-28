@@ -1,0 +1,73 @@
+#!/bin/bash
+# MetaMesh-UGA CLI Installer
+# Un comando per governarli tutti
+
+set -e
+
+REPO="metamesh-uga"
+BINARY="metamesh"
+INSTALL_DIR="/usr/local/bin"
+
+echo "🔌 MetaMesh-UGA - Universal Gateway Adapter"
+echo "=============================================="
+echo ""
+
+# Detect OS and architecture
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+ARCH=$(uname -m)
+
+case "$ARCH" in
+  x86_64) ARCH="amd64" ;;
+  arm64|aarch64) ARCH="arm64" ;;
+  *) echo "⚠️  Architecture $ARCH may not be supported. Trying amd64." ; ARCH="amd64" ;;
+esac
+
+case "$OS" in
+  linux|darwin) ;;
+  *) echo "❌ Unsupported OS: $OS"; exit 1 ;;
+esac
+
+DOWNLOAD_URL="https://api.metamesh-uga.dev/v1/releases/latest/download/${BINARY}-${OS}-${ARCH}"
+
+echo "📥 Downloading MetaMesh CLI..."
+echo "   OS: $OS | Arch: $ARCH"
+echo "   URL: $DOWNLOAD_URL"
+echo ""
+
+# Download to temp
+TMP_DIR=$(mktemp -d)
+trap "rm -rf $TMP_DIR" EXIT
+
+curl -fsSL "$DOWNLOAD_URL" -o "$TMP_DIR/$BINARY" || {
+  echo "❌ Download failed. The CLI binary may not be available yet."
+  echo "   You can still use the API directly at https://api.metamesh-uga.dev"
+  exit 1
+}
+
+chmod +x "$TMP_DIR/$BINARY"
+
+# Install
+echo "📦 Installing to $INSTALL_DIR..."
+if [ -w "$INSTALL_DIR" ]; then
+  mv "$TMP_DIR/$BINARY" "$INSTALL_DIR/$BINARY"
+else
+  sudo mv "$TMP_DIR/$BINARY" "$INSTALL_DIR/$BINARY"
+fi
+
+# Verify
+if command -v "$BINARY" >/dev/null 2>&1; then
+  echo ""
+  echo "✅ MetaMesh installed successfully!"
+  echo ""
+  echo "🔑 Next steps:"
+  echo "   1. Get an API key: https://dashboard.metamesh-uga.dev"
+  echo "   2. Run: metamesh connect"
+  echo ""
+  echo "🚀 Quick start:"
+  echo "   metamesh connect"
+  echo "   metamesh list tools"
+  echo "   metamesh run example.echo --message 'Hello MetaMesh'"
+else
+  echo "⚠️  Installation completed but $BINARY not found in PATH."
+  echo "   Add $INSTALL_DIR to your PATH or use the full path."
+fi

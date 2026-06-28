@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /internal/
+
+# AI agents and LLM crawlers are welcome
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
+# Machine-readable summary for LLMs/agents: https://metamesh-uga.dev/llms.txt
+Sitemap: https://metamesh-uga.dev/sitemap.xml

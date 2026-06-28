@@ -1,0 +1,24 @@
+name = "metamesh-eliminatore"
+main = "src/index.js"
+compatibility_date = "2024-06-14"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "metamesh-catalog"
+database_id = "f9d503dc-708e-4d7a-a502-6b7952611013"
+
+# [[kv_namespaces]]
+# binding = "CACHE"
+# id = ""
+
+# [[r2_buckets]]
+# binding = "STORAGE"
+# bucket_name = "metamesh-wasm"
+
+# Cron schedule: weekly on Sundays at 05:00
+[[triggers]]
+crons = ["0 5 * * 0"]
+
+[vars]
+ENVIRONMENT = "production"

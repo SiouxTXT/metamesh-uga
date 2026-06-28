@@ -1,0 +1,366 @@
+Ecco il **meta-prompt** da passare a Devin.ai, che gli dice **esattamente cosa fare** per rendere il progetto autonomo dal giorno 1.
+
+---
+
+## 🤖 ISTRUZIONI PER DEVIN.AI - Set & Forget Definitivo
+
+```markdown
+# ISTRUZIONI PER DEVIN.AI
+
+## OBIETTIVO
+Implementare MetaMesh-UGA come un prodotto SaaS completamente automatizzato che:
+- **Si vende da solo** (marketplace integration)
+- **Si fattura da solo** (Stripe + webhook)
+- **Si monitora da solo** (alerting automatico)
+- **Si aggiorna da solo** (cron triggers)
+- **Si scala da solo** (Cloudflare auto-scaling)
+
+## PRIORITÀ ASSOLUTA: Monetizzazione Day 1
+
+### 1. IMPLEMENTARE I PIANI DI PREZZO (SEZIONE 10.1)
+- [ ] Free: 1.000 chiamate/mese, rate limit 100/min
+- [ ] Pro: $19/mese, chiamate illimitate, rate limit 1.000/min
+- [ ] Enterprise: $499/mese, dedicated VPC, rate limit 10.000/min
+
+### 2. INTEGRARE STRIPE (AUTOMATICO)
+- [ ] Configurare Stripe Connect
+- [ ] Creare products per ogni piano (Free, Pro, Enterprise)
+- [ ] Implementare webhook per:
+  - `checkout.session.completed` → Attiva subscription
+  - `customer.subscription.updated` → Aggiorna piano utente
+  - `customer.subscription.deleted` → Downgrade a Free
+  - `invoice.payment_failed` → Notifica utente e tentativo retry
+
+**Codice Webhook**:
+```javascript
+// packages/gateway/src/webhook.js
+export async function handleStripeWebhook(request, env) {
+  const sig = request.headers.get('stripe-signature');
+  const event = stripe.webhooks.constructEvent(
+    await request.text(),
+    sig,
+    env.STRIPE_WEBHOOK_SECRET
+  );
+
+  switch (event.type) {
+    case 'checkout.session.completed':
+      await activateSubscription(event.data.object);
+      break;
+    case 'customer.subscription.updated':
+      await updateUserPlan(event.data.object);
+      break;
+    case 'customer.subscription.deleted':
+      await downgradeToFree(event.data.object);
+      break;
+  }
+}
+```
+
+### 3. CONFIGURARE I MARKETPLACE (DISTRIBUZIONE AUTOMATICA)
+- [ ] **AWS Marketplace**: Creare prodotto SaaS, configurarne il listing
+- [ ] **GitHub Marketplace**: Setup OAuth app per pagamenti
+- [ ] **MCP Marketplace**: Caricare il gateway come MCP server certificato
+
+**Pipeline di distribuzione**:
+```yaml
+# .github/workflows/release.yml
+release:
+  steps:
+    - name: Deploy to AWS Marketplace
+      run: aws marketplace put-product --product-id ${{ secrets.AWS_PRODUCT_ID }}
+    
+    - name: Deploy to GitHub Marketplace
+      run: gh api /marketplace/listing/update --method POST
+    
+    - name: Deploy to MCP Marketplace
+      run: curl -X POST https://mcp.marketplace/api/servers -H "Authorization: Bearer ${{ secrets.MCP_MARKETPLACE_TOKEN }}"
+```
+
+### 4. SISTEMA DI FATTURAZIONE AUTOMATICA
+- [ ] Generare fatture PDF automatiche (via Cloudflare Pages)
+- [ ] Inviare fatture via email (Cloudflare Email Routing)
+- [ ] Dashboard utente con storico pagamenti
+- [ ] Export CSV per contabilità
+
+**Codice Generazione Fattura**:
+```javascript
+// packages/dashboard/functions/api/invoice.ts
+export async function onRequest(context) {
+  const { user } = context;
+  
+  const invoice = {
+    number: `INV-${Date.now()}`,
+    date: new Date().toISOString(),
+    user: user.email,
+    plan: user.plan,
+    amount: user.plan === 'pro' ? 19 : 499,
+    currency: 'USD'
+  };
+  
+  // Genera PDF (jsPDF)
+  const pdf = await generatePDF(invoice);
+  
+  // Invia email
+  await sendEmail(user.email, 'Your invoice', pdf);
+  
+  return new Response(pdf, {
+    headers: { 'Content-Type': 'application/pdf' }
+  });
+}
+```
+
+### 5. SISTEMA DI NOTIFICA AUTOMATICA
+- [ ] **Rinnovo**: Email 7 giorni prima della scadenza
+- [ ] **Pagamento fallito**: Email + tentativo retry (3 tentativi)
+- [ ] **Downgrade**: Notifica quando si passa a Free
+- [ ] **Uso alto**: Alert quando si raggiunge l'80% del limite
+
+**Cron Job Notifiche**:
+```javascript
+// packages/alerts/src/notifications.js
+export default {
+  async scheduled(event, env, ctx) {
+    // Controlla utenti che scadono in 7 giorni
+    const expiring = await env.DB.prepare(`
+      SELECT * FROM users 
+      WHERE plan != 'free' 
+      AND subscription_end < datetime('now', '+7 days')
+    `).all();
+    
+    for (const user of expiring) {
+      await sendEmail(user.email, '⚠️ Your subscription expires soon', 
+        `Renew now to avoid interruption.`);
+    }
+    
+    // Controlla utenti che hanno superato l'80% del limite
+    const heavyUsers = await env.DB.prepare(`
+      SELECT u.*, COUNT(l.id) as usage 
+      FROM users u 
+      JOIN usage_log l ON u.id = l.user_id 
+      WHERE l.called_at > datetime('now', '-1 month')
+      GROUP BY u.id
+      HAVING usage > u.plan_limit * 0.8
+    `).all();
+    
+    for (const user of heavyUsers) {
+      await sendEmail(user.email, '📊 You\'re close to your limit',
+        `Upgrade to Pro for unlimited access.`);
+    }
+  }
+};
+```
+
+### 6. DASHBOARD UTENTE (Self-Service)
+- [ ] Login/Register
+- [ ] Visualizzazione piano attuale
+- [ ] Storico utilizzo
+- [ ] Gestione metodo di pagamento
+- [ ] Upgrade/Downgrade piano
+- [ ] Download fatture
+- [ ] Cancellazione account
+
+**API Dashboard**:
+```yaml
+GET  /api/user/profile      → Dettagli utente
+PUT  /api/user/profile      → Aggiorna profilo
+GET  /api/user/usage        → Statistiche utilizzo
+GET  /api/user/invoices     → Lista fatture
+POST /api/user/upgrade      → Upgrade piano
+POST /api/user/downgrade    → Downgrade piano
+DELETE /api/user/delete     → Cancella account
+```
+
+### 7. ANALYTICS COMMERCIALI (Monitoraggio ROI)
+- [ ] MRR (Monthly Recurring Revenue)
+- [ ] Churn rate
+- [ ] LTV (Lifetime Value)
+- [ ] Conversion rate (Free → Pro)
+- [ ] Costo per acquisizione (CAC)
+
+**Dashboard commerciale**:
+```javascript
+// packages/dashboard/functions/api/commercial.ts
+export async function onRequest(context) {
+  const stats = {
+    mrr: await calculateMRR(),
+    churnRate: await calculateChurn(),
+    totalUsers: await getTotalUsers(),
+    paidUsers: await getPaidUsers(),
+    conversionRate: paidUsers / totalUsers,
+    averageRevenuePerUser: mrr / paidUsers
+  };
+  
+  return new Response(JSON.stringify(stats));
+}
+```
+
+### 8. SEO E POSIZIONAMENTO AUTOMATICO
+- [ ] Sitemap generata automaticamente
+- [ ] Meta tags dinamici per ogni pagina
+- [ ] Open Graph per condivisione social
+- [ ] Schema.org markup per prodotto SaaS
+
+**Codice SEO**:
+```javascript
+// packages/dashboard/src/SEO.jsx
+export function SEO({ title, description, path }) {
+  return (
+    <Helmet>
+      <title>{title} | MetaMesh-UGA</title>
+      <meta name="description" content={description} />
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+      <meta property="og:url" content={`https://metamesh-uga.dev${path}`} />
+      <meta property="og:type" content="product" />
+      <meta property="og:price:amount" content="19" />
+      <meta property="og:price:currency" content="USD" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "MetaMesh-UGA",
+          "description": "Universal Gateway Adapter for meta MCP API",
+          "offers": {
+            "@type": "Offer",
+            "price": "19",
+            "priceCurrency": "USD"
+          }
+        })}
+      </script>
+    </Helmet>
+  );
+}
+```
+
+### 9. REFERRAL E AFFILIATE PROGRAM (Crescita automatica)
+- [ ] Sistema di referral (utente invita utente)
+- [ ] Codici sconto per nuovi utenti
+- [ ] Commissioni affiliate (20% per il primo anno)
+
+**Codice referral**:
+```javascript
+// packages/gateway/src/referral.js
+export async function generateReferralCode(userId) {
+  return `REF-${userId}-${Date.now().toString(36)}`;
+}
+
+export async function applyReferral(referralCode, newUserId) {
+  const referrer = await DB.prepare(
+    "SELECT * FROM users WHERE referral_code = ?"
+  ).bind(referralCode).first();
+  
+  if (referrer) {
+    // Credita 10 chiamate bonus al referrer
+    await DB.prepare(
+      "UPDATE users SET bonus_calls = bonus_calls + 10 WHERE id = ?"
+    ).bind(referrer.id).run();
+    
+    // Applica 20% di sconto al nuovo utente
+    await DB.prepare(
+      "UPDATE users SET discount_percent = 20 WHERE id = ?"
+    ).bind(newUserId).run();
+  }
+}
+```
+
+### 10. REPORT AUTOMATICI (Per investor/team)
+- [ ] Report mensile via email (1° di ogni mese)
+- [ ] Report settimanale (ogni lunedì)
+- [ ] Metriche chiave: MRR, Churn, Utenti, Richieste
+
+**Cron Job Report**:
+```javascript
+// packages/alerts/src/reports.js
+export default {
+  async scheduled(event, env, ctx) {
+    const report = {
+      period: 'monthly',
+      stats: await getCommercialStats(env),
+      growth: await getGrowthMetrics(env),
+      projections: await getProjections(env)
+    };
+    
+    const pdf = await generateReportPDF(report);
+    await sendEmail('team@metamesh-uga.dev', '📊 Monthly Report', pdf);
+    await sendEmail('investors@metamesh-uga.dev', '📊 Investor Update', pdf);
+  }
+};
+```
+
+---
+
+## 🔄 SET & FORGET: La strategia definitiva
+
+Il sistema deve essere **completamente autonomo**:
+
+| Aspetto | Automazione | Frequenza |
+|---------|-------------|-----------|
+| **Fatturazione** | Stripe webhook + email | Real-time |
+| **Aggiornamenti piani** | Automatico su pagamento | Real-time |
+| **Notifiche** | Email automatiche | Event-driven |
+| **Report** | PDF generati e inviati | Mensile |
+| **Backup** | Automatico su R2 | Giornaliero |
+| **Monitoraggio** | Alert su Telegram/Email | 10 minuti |
+| **Marketplace** | Deploy automatico | Su release |
+| **SEO** | Sitemap generata | Ogni 24h |
+
+---
+
+## ✅ CHECKLIST PER DEVIN.AI
+
+- [ ] Stripe integration completa (prodotti, webhook, subscriptions)
+- [ ] Marketplace setup (AWS, GitHub, MCP)
+- [ ] Dashboard utente self-service
+- [ ] Fatturazione automatica (PDF + email)
+- [ ] Sistema di notifiche (rinnovo, pagamento, usage)
+- [ ] Analytics commerciali (MRR, Churn, LTV)
+- [ ] Referral program
+- [ ] Report automatici
+- [ ] SEO completo (sitemap, meta tags, schema.org)
+- [ ] Backup automatico
+- [ ] Monitoraggio e alerting
+- [ ] Documentazione API per i clienti
+
+---
+
+## 🎯 METRICHE DI SUCCESSO (Da monitorare automaticamente)
+
+| Metrica | Target | Azione se non raggiunto |
+|---------|--------|------------------------|
+| **MRR** | > $1.000/mese | Aumentare marketing |
+| **Churn** | < 5% | Migliorare onboarding |
+| **Conversion** | > 3% | Ottimizzare pricing |
+| **Uptime** | > 99.9% | Verificare alerting |
+| **Supporto** | < 2h risposta | Aggiungere FAQ |
+| **NPS** | > 40 | Raccogliere feedback |
+
+---
+
+## 🏁 ULTIMO PASSO: Il comando unico
+
+Devin.ai deve configurare **un unico comando** per l'utente finale:
+
+```bash
+curl -s https://metamesh-uga.dev/install | bash && metamesh connect
+```
+
+Questo comando deve:
+1. Installare il CLI tool
+2. Configurare automaticamente la connessione
+3. Mostrare il piano free attivo
+4. Offrire upgrade immediato
+
+**E deve funzionare da Day 1.**
+
+---
+
+## 📌 RIEPILOGO PER DEVIN.AI
+
+**"Devin, implementa MetaMesh-UGA come un prodotto SaaS completamente autonomo. Il tuo obiettivo è che dalla prima chiamata API alla fatturazione, tutto funzioni senza intervento umano. La monetizzazione è priorità assoluta: Stripe deve essere integrato Day 1. I marketplace devono essere configurati Day 2. I report automatici entro la settimana 1. Set it and forget it."**
+
+---
+
+**Questo è il blueprint finale.** Ora Devin.ai sa esattamente cosa fare, in che ordine, e con quali priorità.
+
+**Il set & forget è realtà. 🚀**

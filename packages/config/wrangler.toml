@@ -1,0 +1,18 @@
+name = "metamesh-config"
+main = "src/index.js"
+compatibility_date = "2024-06-14"
+compatibility_flags = ["nodejs_compat"]
+
+# D1 Database
+[[d1_databases]]
+binding = "DB"
+database_name = "metamesh-catalog"
+database_id = "f9d503dc-708e-4d7a-a502-6b7952611013"
+
+# KV Namespace for config cache
+# [[kv_namespaces]]
+# binding = "CONFIG_CACHE"
+# id = ""
+
+[vars]
+ENVIRONMENT = "production"

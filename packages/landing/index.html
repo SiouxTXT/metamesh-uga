@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MetaMesh-UGA — The MCP Operating System</title>
+  <meta name="description" content="One endpoint to discover, verify, route and monetize 13,000+ MCP tools. Serverless, edge-native, with built-in payments for AI agents." />
+  <meta name="keywords" content="MCP, model context protocol, gateway, AI agent, serverless, Cloudflare, WASM, x402, Stripe, API gateway, tool registry, AI agent payments" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="MetaMesh-UGA" />
+  <meta property="og:title" content="MetaMesh-UGA — The MCP Operating System" />
+  <meta property="og:description" content="One endpoint to discover, verify, route and monetize 13,000+ MCP tools." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://metamesh-uga.dev" />
+  <meta property="og:image" content="https://metamesh-uga.dev/og-image.svg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="MetaMesh-UGA — The MCP Operating System" />
+  <meta name="twitter:description" content="One endpoint to discover, verify, route and monetize 13,000+ MCP tools." />
+  <meta name="twitter:image" content="https://metamesh-uga.dev/og-image.svg" />
+  <link rel="canonical" href="https://metamesh-uga.dev" />
+
+  <!-- Discoverability for AI agents -->
+  <link rel="alternate" type="text/plain" title="llms.txt" href="https://metamesh-uga.dev/llms.txt" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "MetaMesh-UGA",
+    "alternateName": "The MCP Operating System",
+    "description": "One endpoint to discover, verify, route and monetize 13,000+ MCP tools. Serverless, edge-native, with built-in payments for AI agents.",
+    "applicationCategory": "DeveloperApplication",
+    "applicationSubCategory": "AI Agent Infrastructure",
+    "operatingSystem": "Cloudflare Workers (serverless, edge)",
+    "url": "https://metamesh-uga.dev",
+    "downloadUrl": "https://api.metamesh-uga.dev/mcp",
+    "offers": [
+      { "@type": "Offer", "name": "Free tier", "price": "0", "priceCurrency": "USD", "description": "Free monthly tool calls, then pay-as-you-go." },
+      { "@type": "Offer", "name": "Pay per call", "price": "0.001", "priceCurrency": "USD", "description": "Per-call pricing via Stripe prepaid credit or x402 USDC." }
+    ],
+    "author": { "@type": "Organization", "name": "MetaMesh-UGA", "url": "https://metamesh-uga.dev" },
+    "featureList": "Unified MCP access, semantic discovery, trust scoring, security scanning, smart routing, Stripe prepaid credit, x402 micropayments, serverless edge deployment"
+  }
+  </script>
+  <style>
+    /* RESET & BASE */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #0f172a; color: #f1f5f9; line-height: 1.6; overflow-x: hidden; }
+    a { color: inherit; text-decoration: none; }
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* ANIMATED AURORA BACKGROUND */
+    .aurora-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
+    .aurora-bg .orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.5; animation: auroraFloat 15s ease-in-out infinite alternate; }
+    .aurora-bg .orb:nth-child(1) { width: 600px; height: 600px; background: #3b82f6; top: -10%; left: -20%; animation-delay: 0s; }
+    .aurora-bg .orb:nth-child(2) { width: 500px; height: 500px; background: #8b5cf6; bottom: -10%; right: -20%; animation-delay: -5s; }
+    .aurora-bg .orb:nth-child(3) { width: 400px; height: 400px; background: #ec4899; top: 40%; left: 60%; animation-delay: -10s; }
+    @keyframes auroraFloat { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(60px, -30px) scale(1.2); } }
+
+    /* GRID BACKGROUND */
+    .grid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none; }
+
+    /* GLASS UI */
+    .glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 1.5rem; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+
+    /* GRADIENT TEXT */
+    .gradient-text { background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: inline-block; }
+
+    /* BUTTONS */
+    .btn-primary { background: #2563eb; color: white; padding: 0.75rem 2rem; border-radius: 0.75rem; font-weight: 600; transition: all 0.2s; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; }
+    .btn-primary:hover { background: #3b82f6; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4); }
+    .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #e2e8f0; padding: 0.75rem 2rem; border-radius: 0.75rem; font-weight: 600; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; }
+    .btn-outline:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.4); }
+
+    /* SECTION TITLES */
+    .section-title { font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; text-align: center; margin-bottom: 0.75rem; }
+    .section-sub { text-align: center; color: #94a3b8; font-size: 1.25rem; max-width: 640px; margin: 0 auto 3rem; }
+
+    /* FEATURE GRID */
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
+    .feature-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.06); border-radius: 1rem; padding: 1.5rem; transition: all 0.3s; text-align: center; }
+    .feature-card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+    .feature-card .icon { font-size: 2rem; margin-bottom: 0.75rem; display: block; }
+    .feature-card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .feature-card p { color: #94a3b8; font-size: 0.875rem; }
+
+    /* PRICING */
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 1100px; margin: 0 auto; }
+    .pricing-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.06); border-radius: 1.5rem; padding: 2rem; text-align: center; transition: all 0.3s; }
+    .pricing-card:hover { transform: translateY(-6px); border-color: rgba(255,255,255,0.15); }
+    .pricing-card.popular { border-color: #3b82f6; box-shadow: 0 0 30px rgba(59, 130, 246, 0.15); }
+    .pricing-card .price { font-size: 2.5rem; font-weight: 800; margin: 0.5rem 0; }
+    .pricing-card .price span { font-size: 1rem; font-weight: 400; color: #94a3b8; }
+    .pricing-card ul { list-style: none; margin: 1.5rem 0; text-align: left; }
+    .pricing-card ul li { padding: 0.4rem 0; display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; color: #cbd5e1; }
+    .pricing-card ul li::before { content: "\2713"; color: #34d399; font-weight: 700; }
+
+    /* FAQ */
+    .faq-item { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.06); border-radius: 0.75rem; margin-bottom: 0.75rem; overflow: hidden; }
+    .faq-question { width: 100%; padding: 1rem 1.5rem; background: transparent; border: none; color: #f1f5f9; font-size: 1rem; font-weight: 600; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s; font-family: inherit; }
+    .faq-question:hover { background: rgba(255,255,255,0.03); }
+    .faq-question .arrow { transition: transform 0.3s; }
+    .faq-question.open .arrow { transform: rotate(180deg); }
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s ease; padding: 0 1.5rem; color: #94a3b8; }
+    .faq-answer.open { max-height: 240px; padding: 0 1.5rem 1.5rem; }
+
+    /* CODE BLOCK */
+    .code-block { background: #0f172a; border: 1px solid #1e293b; border-radius: 0.75rem; padding: 1rem 1.5rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #60a5fa; overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
+
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      .container { padding: 0 1rem; }
+      .hero-title { font-size: 2.5rem; }
+      .feature-grid { grid-template-columns: 1fr 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- AURORA & GRID BACKGROUND -->
+  <div class="aurora-bg"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+  <div class="grid-bg"></div>
+
+  <!-- NAVBAR -->
+  <nav class="glass" style="position: fixed; top: 0; left: 0; right: 0; z-index: 50; margin: 0.5rem 1rem; padding: 0 1.5rem; height: 4rem; display: flex; align-items: center; justify-content: space-between; border-radius: 1.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #3b82f6;"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>
+      <span style="font-weight: 800; font-size: 1.2rem;">MetaMesh<span style="color: #3b82f6;">-UGA</span></span>
+    </div>
+    <div class="nav-links" style="display: flex; align-items: center; gap: 2rem;">
+      <a href="#features" style="color: #94a3b8;" onmouseenter="this.style.color='#f1f5f9'" onmouseleave="this.style.color='#94a3b8'">Features</a>
+      <a href="#payments" style="color: #94a3b8;" onmouseenter="this.style.color='#f1f5f9'" onmouseleave="this.style.color='#94a3b8'">Payments</a>
+      <a href="#pricing" style="color: #94a3b8;" onmouseenter="this.style.color='#f1f5f9'" onmouseleave="this.style.color='#94a3b8'">Pricing</a>
+      <a href="https://github.com/metamesh-uga/metamesh-uga" target="_blank" rel="noopener" style="color: #94a3b8;" onmouseenter="this.style.color='#f1f5f9'" onmouseleave="this.style.color='#94a3b8'">GitHub</a>
+      <a href="#connect" class="btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.9rem;">Connect</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section style="padding: 8rem 0 4rem; text-align: center;">
+    <div class="container">
+      <a href="https://registry.modelcontextprotocol.io/?q=dev.metamesh-uga" target="_blank" rel="noopener" style="display: inline-block; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 2rem; padding: 0.3rem 1.2rem; margin-bottom: 1.5rem; color: #60a5fa; font-size: 0.85rem; font-weight: 500;">
+        ⚡ Listed on the official MCP Registry
+      </a>
+      <h1 class="hero-title" style="font-size: clamp(2.8rem, 8vw, 4.5rem); font-weight: 800; line-height: 1.1; margin-bottom: 1rem;">
+        The <span class="gradient-text">MCP Operating System</span>
+      </h1>
+      <p style="font-size: 1.25rem; color: #94a3b8; max-width: 720px; margin: 0 auto 1.5rem;">
+        One endpoint to discover, verify, route and monetize <strong style="color: #f1f5f9;">13,000+</strong> MCP tools. Serverless, edge-native, with built-in payments for AI agents.
+      </p>
+      <div id="connect" class="glass" style="max-width: 640px; margin: 2rem auto; padding: 1.5rem 2rem;">
+        <p style="color: #94a3b8; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; justify-content: center; margin-bottom: 0.75rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke: #3b82f6;"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></svg>
+          Add to any MCP client (Claude, Windsurf, Cursor, Antigravity)
+        </p>
+        <div style="display: flex; align-items: center; gap: 0.75rem; background: rgba(15, 23, 42, 0.8); border-radius: 0.75rem; padding: 0.5rem 1rem; border: 1px solid #1e293b;">
+          <code style="flex:1; color: #60a5fa; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; overflow-x: auto; white-space: nowrap;">https://api.metamesh-uga.dev/mcp</code>
+          <button onclick="copyToClipboard('https://api.metamesh-uga.dev/mcp')" style="background: #2563eb; border: none; color: white; padding: 0.3rem 1rem; border-radius: 0.5rem; cursor: pointer; font-weight: 500;" onmouseenter="this.style.background='#3b82f6'" onmouseleave="this.style.background='#2563eb'">Copy</button>
+        </div>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-top: 2rem;">
+        <a href="#demo" class="btn-primary">See it in action →</a>
+        <a href="https://docs.metamesh-uga.dev" class="btn-outline">Read Documentation</a>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 2rem; margin-top: 4rem; padding-top: 3rem; border-top: 1px solid rgba(255,255,255,0.06);">
+        <div><div style="font-size: 2.2rem; font-weight: 800;">13,147</div><div style="color: #94a3b8; font-size: 0.9rem;">MCP Tools Indexed</div></div>
+        <div><div style="font-size: 2.2rem; font-weight: 800;">&lt; 50ms</div><div style="color: #94a3b8; font-size: 0.9rem;">Edge Latency</div></div>
+        <div><div style="font-size: 2.2rem; font-weight: 800;">300+</div><div style="color: #94a3b8; font-size: 0.9rem;">Global Locations</div></div>
+        <div><div style="font-size: 2.2rem; font-weight: 800;">2-Way</div><div style="color: #94a3b8; font-size: 0.9rem;">Stripe + x402 Pay</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" style="padding: 4rem 0;">
+    <div class="container">
+      <h2 class="section-title">The MCP Operating System</h2>
+      <p class="section-sub">18+ primitives that turn any MCP server into a managed, observable, monetizable service</p>
+      <div class="feature-grid">
+        <div class="feature-card"><span class="icon">⚡</span><h3>Serverless Edge</h3><p>Zero infrastructure. 300+ global locations.</p></div>
+        <div class="feature-card"><span class="icon">🛡️</span><h3>WASM Runtime</h3><p>Secure, sandboxed execution.</p></div>
+        <div class="feature-card"><span class="icon">🤖</span><h3>AI Agent Economy</h3><p>Native x402 + Stripe payments.</p></div>
+        <div class="feature-card"><span class="icon">🌐</span><h3>Universal Access</h3><p>Single endpoint for all MCP servers.</p></div>
+        <div class="feature-card"><span class="icon">💳</span><h3>Pay Per Call</h3><p>Free quota, then usage-based pricing.</p></div>
+        <div class="feature-card"><span class="icon">🔄</span><h3>Set &amp; Forget</h3><p>Automated discovery, backups, monitoring.</p></div>
+        <div class="feature-card"><span class="icon">🔒</span><h3>Security &amp; Trust</h3><p>CVE scanning, trust scores.</p></div>
+        <div class="feature-card"><span class="icon">💊</span><h3>Self-Healing</h3><p>Auto-detect failures and rollback.</p></div>
+        <div class="feature-card"><span class="icon">📊</span><h3>Real-time Analytics</h3><p>Prometheus, OpenTelemetry, dashboards.</p></div>
+        <div class="feature-card"><span class="icon">🔍</span><h3>Semantic Search</h3><p>Find tools by intent or capability.</p></div>
+        <div class="feature-card"><span class="icon">🗂️</span><h3>Registry Sync</h3><p>Federate with official/community registries.</p></div>
+        <div class="feature-card"><span class="icon">❤️</span><h3>Health Monitoring</h3><p>Periodic checks and degradation handling.</p></div>
+        <div class="feature-card"><span class="icon">🧠</span><h3>Smart Routing</h3><p>Route based on trust, latency, cost, health.</p></div>
+        <div class="feature-card"><span class="icon">☁️</span><h3>Cloudflare Native</h3><p>KV, R2, D1, Queues, Workers.</p></div>
+        <div class="feature-card"><span class="icon">💻</span><h3>MCP Compatible</h3><p>Full JSON-RPC and SSE support.</p></div>
+        <div class="feature-card"><span class="icon">⌨️</span><h3>CLI &amp; SDK</h3><p>Command-line tools and SDKs.</p></div>
+        <div class="feature-card"><span class="icon">🔔</span><h3>Alerting</h3><p>Telegram, email, webhook alerts.</p></div>
+        <div class="feature-card"><span class="icon">🔄</span><h3>Lifecycle Management</h3><p>States: DISCOVERED → ACTIVE → DEPRECATED.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section style="padding: 4rem 0; background: rgba(15, 23, 42, 0.5);">
+    <div class="container">
+      <h2 class="section-title">How it works</h2>
+      <p class="section-sub">Try it free, then pay only when it proves useful</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 2rem; max-width: 960px; margin: 0 auto;">
+        <div class="glass" style="padding: 2rem; text-align: center;">
+          <div style="width: 3rem; height: 3rem; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-weight: 800; font-size: 1.5rem;">1</div>
+          <h3 style="font-size: 1.2rem; font-weight: 600;">Connect</h3>
+          <p style="color: #94a3b8; font-size: 0.95rem;">Point any MCP client at the gateway URL. Discovery and your first calls are free.</p>
+        </div>
+        <div class="glass" style="padding: 2rem; text-align: center;">
+          <div style="width: 3rem; height: 3rem; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-weight: 800; font-size: 1.5rem;">2</div>
+          <h3 style="font-size: 1.2rem; font-weight: 600;">Discover</h3>
+          <p style="color: #94a3b8; font-size: 0.95rem;">Browse 13,000+ indexed MCP tools with trust and security scores. Filter by namespace or intent.</p>
+        </div>
+        <div class="glass" style="padding: 2rem; text-align: center;">
+          <div style="width: 3rem; height: 3rem; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-weight: 800; font-size: 1.5rem;">3</div>
+          <h3 style="font-size: 1.2rem; font-weight: 600;">Pay &amp; scale</h3>
+          <p style="color: #94a3b8; font-size: 0.95rem;">After the free quota, top up with Stripe credit or pay per call via x402 — handled automatically.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEMO -->
+  <section id="demo" style="padding: 4rem 0;">
+    <div class="container">
+      <h2 class="section-title">See it in action</h2>
+      <p class="section-sub">Real endpoints. Copy, paste, run.</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 1000px; margin: 0 auto;">
+        <div class="glass" style="padding: 1.5rem; overflow: hidden;">
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+            <span style="width: 0.75rem; height: 0.75rem; background: #ef4444; border-radius: 50%;"></span>
+            <span style="width: 0.75rem; height: 0.75rem; background: #eab308; border-radius: 50%;"></span>
+            <span style="width: 0.75rem; height: 0.75rem; background: #22c55e; border-radius: 50%;"></span>
+            <span style="color: #64748b; font-size: 0.8rem; margin-left: 0.5rem;">Onboard an agent</span>
+          </div>
+          <pre style="background: #0f172a; padding: 1rem; border-radius: 0.5rem; color: #4ade80; font-size: 0.8rem; overflow-x: auto; white-space: pre-wrap; word-break: break-all;"># 1. Register an agent (get agent_id + api_key)
+curl -X POST \
+  https://api.metamesh-uga.dev/v1/agent/register \
+  -d '{"name":"my-agent"}'
+
+# 2. Top up balance via Stripe Checkout
+curl -X POST \
+  https://api.metamesh-uga.dev/v1/agent/topup \
+  -H "X-Agent-Id: agent_..." \
+  -H "X-Agent-Key: ak_..." \
+  -d '{"amount_usd": 25}'
+# -> open checkout_url to pay</pre>
+        </div>
+        <div class="glass" style="padding: 1.5rem; overflow: hidden;">
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+            <span style="width: 0.75rem; height: 0.75rem; background: #ef4444; border-radius: 50%;"></span>
+            <span style="width: 0.75rem; height: 0.75rem; background: #eab308; border-radius: 50%;"></span>
+            <span style="width: 0.75rem; height: 0.75rem; background: #22c55e; border-radius: 50%;"></span>
+            <span style="color: #64748b; font-size: 0.8rem; margin-left: 0.5rem;">Discover &amp; call tools</span>
+          </div>
+          <pre style="background: #0f172a; padding: 1rem; border-radius: 0.5rem; color: #60a5fa; font-size: 0.8rem; overflow-x: auto; white-space: pre-wrap; word-break: break-all;"># Browse 13,000+ indexed tools (free)
+curl https://api.metamesh-uga.dev/v1/tools?limit=20
+
+# Call a tool (free quota, then debits balance)
+curl -X POST \
+  https://api.metamesh-uga.dev/v1/call \
+  -H "X-Agent-Id: agent_..." \
+  -H "X-Agent-Key: ak_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tool": "example.echo",
+    "params": { "message": "hi" }
+  }'</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAYMENTS -->
+  <section id="payments" style="padding: 4rem 0; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(15,23,42,0.9), rgba(88, 28, 135, 0.2)); z-index: -1;"></div>
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 3rem;">
+        <span style="display: inline-block; background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 2rem; padding: 0.3rem 1.2rem; color: #fbbf24; font-size: 0.85rem; font-weight: 500; margin-bottom: 1rem;">Built for the AI Agent Economy</span>
+        <h2 class="section-title">Two ways to <span class="gradient-text">pay per call</span></h2>
+        <p class="section-sub">Start free. When the free quota runs out, fund agents with Stripe or settle on-chain with x402.</p>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 960px; margin: 0 auto;">
+        <div class="glass" style="padding: 2rem; border-color: rgba(59, 130, 246, 0.2);">
+          <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+            <div style="background: rgba(59, 130, 246, 0.15); border-radius: 0.75rem; padding: 0.5rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #60a5fa;"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+            </div>
+            <div><h3 style="font-weight: 700;">Stripe Prepaid Credit</h3><p style="color: #94a3b8; font-size: 0.85rem;">Fiat · live now</p></div>
+          </div>
+          <ul style="list-style: none; margin-bottom: 1.5rem; text-align: left;">
+            <li style="display: flex; gap: 0.5rem; padding: 0.3rem 0; color: #cbd5e1; font-size: 0.95rem;"><span style="color: #34d399;">✓</span> Register an agent and get an API key instantly</li>
+            <li style="display: flex; gap: 0.5rem; padding: 0.3rem 0; color: #cbd5e1; font-size: 0.95rem;"><span style="color: #34d399;">✓</span> Top up your USD balance via Stripe Checkout</li>
+            <li style="display: flex; gap: 0.5rem; padding: 0.3rem 0; color: #cbd5e1; font-size: 0.95rem;"><span style="color: #34d399;">✓</span> Per-call pricing debited atomically from balance</li>
+            <li style="display: flex; gap: 0.5rem; padding: 0.3rem 0; color: #cbd5e1; font-size: 0.95rem;"><span style="color: #34d399;">✓</span> Budgets, spend limits and transaction history</li>
+          </ul>
+          <div class="code-block">POST /v1/agent/topup { "amount_usd": 25 }</div>
+        </div>
+        <div class="glass" style="padding: 2rem; border-color: rgba(168, 85, 247, 0.2);">
+          <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+            <div style="background: rgba(168, 85, 247, 0.15); border-radius: 0.75rem; padding: 0.5rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #a78bfa;"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
+            </div>
+            <div><h3 style="font-weight: 700;">x402 Micropayments</h3><p style="color: #94a3b8; font-size: 0.85rem;">USDC on Base · on-chain</p></div>
+          </div>
+          <ul style="list-style: none; margin-bottom: 1.5rem; text-align: left;">
+            <li style="display: flex; gap: 0.5rem; padding: 0.3rem 0; color: #cbd5e1; font-size: 0.95rem;"><span style="color: #34d399;">✓</span> Pay-as-you-go with the HTTP 402 standard</li>
+            <li style="display: flex; gap: 0.5rem; padding: 0.3rem 0; color: #cbd5e1; font-size: 0.95rem;"><span style="color: #34d399;">✓</span> EIP-712 signed payments, no account required</li>
+            <li style="display: flex; gap: 0.5rem; padding: 0.3rem 0; color: #cbd5e1; font-size: 0.95rem;"><span style="color: #34d399;">✓</span> Settles in USDC on Base via x402 facilitator</li>
+            <li style="display: flex; gap: 0.5rem; padding: 0.3rem 0; color: #cbd5e1; font-size: 0.95rem;"><span style="color: #34d399;">✓</span> Ideal for autonomous, walleted AI agents</li>
+          </ul>
+          <div class="code-block">POST /v1/call  ·  X-PAYMENT: &lt;x402 header&gt;</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing" style="padding: 4rem 0;">
+    <div class="container">
+      <h2 class="section-title">Simple pricing</h2>
+      <p class="section-sub">Start free, pay only when you keep using it</p>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <h3 style="font-size: 1.5rem; font-weight: 700;">Free</h3>
+          <div class="price">$0 <span>/month</span></div>
+          <p style="color: #94a3b8; font-size: 0.95rem;">Try it, no card required</p>
+          <ul>
+            <li>Free monthly tool calls</li>
+            <li>Unlimited tool discovery &amp; search</li>
+            <li>Access to all 13,147 tools</li>
+            <li>MCP + REST endpoints</li>
+            <li>Community support</li>
+          </ul>
+          <a href="#connect" class="btn-primary" style="width: 100%; justify-content: center;">Start Free</a>
+        </div>
+        <div class="pricing-card popular">
+          <div style="background: #2563eb; color: white; font-size: 0.75rem; font-weight: 700; padding: 0.2rem 1rem; border-radius: 1rem; display: inline-block; margin-bottom: 0.5rem;">Pay as you go</div>
+          <h3 style="font-size: 1.5rem; font-weight: 700;">Usage</h3>
+          <div class="price">$0.001 <span>/call</span></div>
+          <p style="color: #94a3b8; font-size: 0.95rem;">After the free quota</p>
+          <ul>
+            <li>Stripe prepaid credit or x402 USDC</li>
+            <li>Volume pricing from $0.0005/call</li>
+            <li>Per-agent budgets &amp; spend limits</li>
+            <li>Transaction history</li>
+            <li>Priority routing</li>
+          </ul>
+          <a href="#connect" class="btn-primary" style="width: 100%; justify-content: center;">Top up &amp; scale</a>
+        </div>
+        <div class="pricing-card">
+          <h3 style="font-size: 1.5rem; font-weight: 700;">Enterprise</h3>
+          <div class="price">Custom</div>
+          <p style="color: #94a3b8; font-size: 0.95rem;">For teams and platforms</p>
+          <ul>
+            <li>Everything in Usage</li>
+            <li>Dedicated WASM runner</li>
+            <li>99.9% SLA</li>
+            <li>Custom categories &amp; SSO</li>
+            <li>Dedicated support</li>
+          </ul>
+          <a href="mailto:hello@metamesh-uga.dev" class="btn-primary" style="width: 100%; justify-content: center;">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section style="padding: 4rem 0; background: rgba(15, 23, 42, 0.5);">
+    <div class="container" style="max-width: 768px;">
+      <h2 class="section-title">Frequently asked questions</h2>
+      <div style="margin-top: 2rem;">
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">What is MCP? <span class="arrow">▼</span></button>
+          <div class="faq-answer">MCP (Model Context Protocol) is an open standard that lets AI agents interact with tools and servers. MetaMesh-UGA aggregates 13,000+ MCP servers into a single, unified gateway.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">How does the free tier work? <span class="arrow">▼</span></button>
+          <div class="faq-answer">Discovery (tools/list, search) is always free. Every caller gets a free monthly quota of tool calls. Once you exhaust it, you top up Stripe credit or pay per call via x402 — your agent keeps working without interruption.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">What is x402 and how does it work? <span class="arrow">▼</span></button>
+          <div class="faq-answer">x402 is the HTTP 402 "Payment Required" standard. Agents pay for individual tool calls in USDC on Base using signed EIP-712 messages — no account needed.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">How do AI agents find MetaMesh? <span class="arrow">▼</span></button>
+          <div class="faq-answer">MetaMesh-UGA is listed on the official MCP Registry and exposes a machine-readable llms.txt and JSON-RPC discovery endpoint, so agents and clients can find and connect automatically.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">Is my data secure? <span class="arrow">▼</span></button>
+          <div class="faq-answer">Yes. All traffic is encrypted via TLS 1.3. We store only usage metrics, and tool execution runs in a sandboxed WASM runtime.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section style="padding: 4rem 0;">
+    <div class="container" style="text-align: center;">
+      <h2 style="font-size: 2.5rem; font-weight: 800;">Ready to get started?</h2>
+      <p style="color: #94a3b8; font-size: 1.25rem; margin: 1rem 0 2rem;">Connect your agent in seconds — the first calls are on us.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
+        <a href="#connect" class="btn-primary">Start Free</a>
+        <a href="https://docs.metamesh-uga.dev" class="btn-outline">Read Documentation →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer style="border-top: 1px solid rgba(255,255,255,0.06); padding: 3rem 0;">
+    <div class="container">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #3b82f6;"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>
+            <span style="font-weight: 800; font-size: 1.2rem;">MetaMesh<span style="color: #3b82f6;">-UGA</span></span>
+          </div>
+          <p style="color: #94a3b8; font-size: 0.9rem;">The MCP Operating System — A serverless control plane for AI agents and MCP infrastructure.</p>
+        </div>
+        <div>
+          <h4 style="font-weight: 600; margin-bottom: 0.5rem;">Product</h4>
+          <ul style="list-style: none; color: #94a3b8; font-size: 0.9rem;">
+            <li style="padding: 0.2rem 0;"><a href="#features" onmouseenter="this.style.color='#f1f5f9'" onmouseleave="this.style.color='#94a3b8'">Features</a></li>
+            <li style="padding: 0.2rem 0;"><a href="#pricing" onmouseenter="this.style.color='#f1f5f9'" onmouseleave="this.style.color='#94a3b8'">Pricing</a></li>
+            <li style="padding: 0.2rem 0;"><a href="https://dashboard.metamesh-uga.dev" onmouseenter="this.style.color='#f1f5f9'" onmouseleave="this.style.color='#94a3b8'">Dashboard</a></li>
+            <li style="padding: 0.2rem 0;"><a href="https://registry.modelcontextprotocol.io/?q=dev.metamesh-uga" onmouseenter="this.style.color='#f1f5f9'" onmouseleave="this.style.color='#94a3b8'">MCP Registry</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="font-weight: 600; margin-bottom: 0.5rem;">Resources</h4>
+          <ul style="list-style: none; color: #94a3b8; font-size: 0.9rem;">
+            <li style="padding: 0.2rem 0;"><a href="https://docs.metamesh-uga.dev" onmouseenter="this.style.color='#f1f5f9'" onmouseleave="this.style.color='#94a3b8'">Documentation</a></li>
+            <li style="padding: 0.2rem 0;"><a href="https://api.metamesh-uga.dev/docs" onmouseenter="this.style.color='#f1f5f9'" onmouseleave="this.style.color='#94a3b8'">API Reference</a></li>
+            <li style="padding: 0.2rem 0;"><a href="https://metamesh-uga.dev/llms.txt" onmouseenter="this.style.color='#f1f5f9'" onmouseleave="this.style.color='#94a3b8'">llms.txt</a></li>
+            <li style="padding: 0.2rem 0;"><a href="https://api.metamesh-uga.dev/mcp" onmouseenter="this.style.color='#f1f5f9'" onmouseleave="this.style.color='#94a3b8'">MCP Endpoint</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="font-weight: 600; margin-bottom: 0.5rem;">Connect</h4>
+          <div style="display: flex; gap: 1rem;">
+            <a href="https://github.com/metamesh-uga/metamesh-uga" target="_blank" rel="noopener" style="color: #94a3b8;" onmouseenter="this.style.color='#f1f5f9'" onmouseleave="this.style.color='#94a3b8'">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+            </a>
+            <a href="mailto:hello@metamesh-uga.dev" style="color: #94a3b8;" onmouseenter="this.style.color='#f1f5f9'" onmouseleave="this.style.color='#94a3b8'">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; color: #64748b; font-size: 0.9rem;">
+        <span>© 2026 MetaMesh-UGA. All rights reserved.</span>
+        <div style="display: flex; gap: 1.5rem;">
+          <a href="#" onmouseenter="this.style.color='#f1f5f9'" onmouseleave="this.style.color='#64748b'">Privacy</a>
+          <a href="#" onmouseenter="this.style.color='#f1f5f9'" onmouseleave="this.style.color='#64748b'">Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        const original = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = original, 2000);
+      });
+    }
+    function toggleFaq(btn) {
+      const answer = btn.nextElementSibling;
+      const isOpen = answer.classList.contains('open');
+      document.querySelectorAll('.faq-answer').forEach(el => el.classList.remove('open'));
+      document.querySelectorAll('.faq-question').forEach(el => el.classList.remove('open'));
+      if (!isOpen) { answer.classList.add('open'); btn.classList.add('open'); }
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const firstFaq = document.querySelector('.faq-question');
+      if (firstFaq) toggleFaq(firstFaq);
+    });
+  </script>
+</body>
+</html>

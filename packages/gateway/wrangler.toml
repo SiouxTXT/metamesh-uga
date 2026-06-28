@@ -1,0 +1,54 @@
+name = "metamesh-gateway"
+main = "src/index.js"
+compatibility_date = "2024-06-14"
+compatibility_flags = ["nodejs_compat"]
+
+# This is a service worker - no route needed here, defined in root wrangler.toml
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "metamesh-catalog"
+database_id = "f9d503dc-708e-4d7a-a502-6b7952611013"
+
+# KV Namespaces
+[[kv_namespaces]]
+binding = "CACHE"
+id = "e3fb217363a04f53903b14b4cb503034"
+
+[[kv_namespaces]]
+binding = "CONFIG_CACHE"
+id = "38d187a2778f4fc8897e509c1ac62cdc"
+
+# R2 Buckets
+[[r2_buckets]]
+binding = "STORAGE"
+bucket_name = "metamesh-wasm"
+
+[[r2_buckets]]
+binding = "REGISTRY_MIRROR"
+bucket_name = "metamesh-registry-mirror"
+
+[[r2_buckets]]
+binding = "ANALYTICS_STORAGE"
+bucket_name = "metamesh-analytics"
+
+# Analytics Engine
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "metamesh_usage"
+
+
+# Environment variables
+[vars]
+ENVIRONMENT = "production"
+X402_CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"
+
+# Secrets (use `wrangler secret put` to set these):
+# JWT_SECRET
+# STRIPE_SECRET_KEY
+# STRIPE_WEBHOOK_SECRET
+# ADMIN_KEY
+# TELEGRAM_BOT_TOKEN
+# TELEGRAM_CHAT_ID
+# SENTRY_DSN

@@ -1,0 +1,42 @@
+# MetaMesh-UGA — The MCP Operating System
+
+> MetaMesh-UGA is a serverless, edge-native gateway that lets AI agents discover, verify, route and call 13,000+ Model Context Protocol (MCP) tools through a single endpoint. Discovery and a free monthly quota of tool calls are free; beyond the quota, agents pay per call via Stripe prepaid credit or x402 (USDC on Base).
+
+## For AI agents — connect in one step
+
+- Add this MCP endpoint to any MCP client (Claude, Windsurf, Cursor, Antigravity):
+  https://api.metamesh-uga.dev/mcp
+- Transport: streamable-http (JSON-RPC 2.0) and legacy SSE.
+- No account required to start. Use `tools/list` to discover and `tools/call` to execute.
+
+## How to use it
+
+- Discover tools (free): `POST https://api.metamesh-uga.dev/mcp` with `{"jsonrpc":"2.0","id":1,"method":"tools/list"}`
+- Semantic search (free): call the native tool `metamesh.search_tools` with `{ "query": "<intent>" }`
+- Call a tool: `POST https://api.metamesh-uga.dev/mcp` with `{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"<tool>","arguments":{}}}`
+- REST equivalent: `POST https://api.metamesh-uga.dev/v1/call` with `{ "tool": "<tool>", "params": {} }`
+
+## Pricing model (freemium)
+
+- Free: tool discovery/search always free, plus a free monthly quota of tool calls.
+- Paid after quota: $0.001 per call (volume from $0.0005). Pay with:
+  - Stripe prepaid credit (fiat): register an agent, then `POST /v1/agent/topup`.
+  - x402 micropayments (USDC on Base): send an `X-PAYMENT` header; on HTTP 402 read the `accepts` requirements.
+
+## Key endpoints
+
+- MCP hub: https://api.metamesh-uga.dev/mcp
+- Tool catalog (REST): https://api.metamesh-uga.dev/v1/tools
+- Tool execution (REST): https://api.metamesh-uga.dev/v1/call
+- Agent registration: https://api.metamesh-uga.dev/v1/agent/register
+- Stripe top-up: https://api.metamesh-uga.dev/v1/agent/topup
+- Billing info: https://api.metamesh-uga.dev/v1/billing/info
+- x402 info: https://api.metamesh-uga.dev/v1/x402/info
+- API docs: https://api.metamesh-uga.dev/docs
+
+## Links
+
+- Website: https://metamesh-uga.dev
+- Dashboard: https://dashboard.metamesh-uga.dev
+- Official MCP Registry: https://registry.modelcontextprotocol.io/?q=dev.metamesh-uga
+- Source: https://github.com/metamesh-uga/metamesh-uga

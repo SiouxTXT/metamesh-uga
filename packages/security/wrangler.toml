@@ -1,0 +1,18 @@
+name = "metamesh-security"
+main = "src/index.js"
+compatibility_date = "2024-06-14"
+compatibility_flags = ["nodejs_compat"]
+
+# Cron schedule: daily at 03:30
+[[triggers]]
+crons = ["30 3 * * *"]
+
+# D1 Database
+[[d1_databases]]
+binding = "DB"
+database_name = "metamesh-catalog"
+database_id = "f9d503dc-708e-4d7a-a502-6b7952611013"
+
+[vars]
+ENVIRONMENT = "production"
+NVD_API_URL = "https://services.nvd.nist.gov/rest/json/cves/2.0"

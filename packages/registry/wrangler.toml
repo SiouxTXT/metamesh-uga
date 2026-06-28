@@ -1,0 +1,24 @@
+name = "metamesh-registry"
+main = "src/index.js"
+compatibility_date = "2024-06-14"
+compatibility_flags = ["nodejs_compat"]
+
+# Cron schedule: every 6 hours (sync with all registries)
+[[triggers]]
+crons = ["0 */6 * * *"]
+
+# D1 Database
+[[d1_databases]]
+binding = "DB"
+database_name = "metamesh-catalog"
+database_id = "f9d503dc-708e-4d7a-a502-6b7952611013"
+
+# R2 Bucket for registry snapshots
+# [[r2_buckets]]
+# binding = "REGISTRY_MIRROR"
+# bucket_name = "metamesh-registry-mirror"
+
+[vars]
+ENVIRONMENT = "production"
+MCP_REGISTRY_URL = "https://registry.mcp.io/v0.1/servers"
+SMITHERY_API_URL = "https://registry.smithery.ai/servers"

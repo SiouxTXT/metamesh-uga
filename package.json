@@ -1,0 +1,75 @@
+{
+  "name": "metamesh-uga",
+  "version": "1.0.0",
+  "description": "The MCP Operating System — A Universal Control Plane for AI Agents and MCP Infrastructure",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "deploy:workers": "wrangler deploy --config packages/gateway/wrangler.toml && wrangler deploy --config packages/registry/wrangler.toml && wrangler deploy --config packages/discovery/wrangler.toml && wrangler deploy --config packages/trust/wrangler.toml && wrangler deploy --config packages/security/wrangler.toml && wrangler deploy --config packages/policy/wrangler.toml && wrangler deploy --config packages/benchmark/wrangler.toml && wrangler deploy --config packages/lifecycle/wrangler.toml && wrangler deploy --config packages/intelligence/wrangler.toml && wrangler deploy --config packages/compatibility/wrangler.toml && wrangler deploy --config packages/analytics/wrangler.toml && wrangler deploy --config packages/health/wrangler.toml && wrangler deploy --config packages/config/wrangler.toml && wrangler deploy --config packages/cache/wrangler.toml && wrangler deploy --config packages/self-healing/wrangler.toml && wrangler deploy --config packages/recommendation/wrangler.toml && wrangler deploy --config packages/cost/wrangler.toml && wrangler deploy --config packages/inserter/wrangler.toml && wrangler deploy --config packages/updater/wrangler.toml && wrangler deploy --config packages/eliminatore/wrangler.toml && wrangler deploy --config packages/alerts/wrangler.toml && wrangler deploy --config packages/agent-billing/wrangler.toml",
+    "deploy:dashboard": "cd packages/dashboard && npm run deploy",
+    "deploy:landing": "cd packages/landing && npm run deploy",
+    "deploy:all": "npm run build && npm run deploy:workers && npm run deploy:dashboard && npm run deploy:landing",
+    "deploy:production": "node scripts/autonomous-deploy.js",
+    "launch:autonomous": "node scripts/autonomous-deploy.js",
+    "dev:gateway": "wrangler dev --config packages/gateway/wrangler.toml",
+    "db:migrate": "wrangler d1 execute metamesh-catalog --file=./shared/migrations/001_init.sql && wrangler d1 execute metamesh-catalog --file=./shared/migrations/002_seed_data.sql && wrangler d1 execute metamesh-catalog --file=./shared/migrations/003_discovery_log.sql && wrangler d1 execute metamesh-catalog --file=./shared/migrations/004_trust_and_lifecycle.sql && wrangler d1 execute metamesh-catalog --file=./shared/migrations/005_semantic_search.sql && wrangler d1 execute metamesh-catalog --file=./shared/migrations/006_policies.sql && wrangler d1 execute metamesh-catalog --file=./shared/migrations/007_benchmark_results.sql && wrangler d1 execute metamesh-catalog --file=./shared/migrations/008_registry_sources_seed.sql && wrangler d1 execute metamesh-catalog --file=./shared/migrations/009_analytics_metrics.sql && wrangler d1 execute metamesh-catalog --file=./shared/migrations/010_registry_snapshots.sql && wrangler d1 execute metamesh-catalog --file=./shared/migrations/011_config.sql && wrangler d1 execute metamesh-catalog --file=./shared/migrations/012_health_checks.sql",
+    "db:seed": "wrangler d1 execute metamesh-catalog --file=./shared/migrations/002_seed_data.sql",
+    "db:backup": "node scripts/backup-db.js",
+    "health:check": "curl -s https://api.metamesh-uga.dev/health | jq .",
+    "self-healing:start": "node scripts/self-healing.js",
+    "self-healing:once": "node -e \"require('./scripts/self-healing').SelfHealingMonitor.prototype.healthCheckCycle()\"",
+    "credentials:rotate": "node scripts/credential-rotation.js",
+    "credentials:backup": "node -e \"const {CredentialManager} = require('./scripts/autonomous-deploy'); new CredentialManager().backup()\"",
+    "report:status": "curl -s https://api.metamesh-uga.dev/health && echo '' && curl -s https://api.metamesh-uga.dev/v1/tools?limit=1",
+    "verify:endpoints": "bash scripts/verify-endpoints.sh",
+    "verify:security-trust": "bash scripts/run-security-and-trust.sh",
+    "verify:bindings": "bash scripts/enable-bindings.sh",
+    "validation:report": "node scripts/validation-report.js",
+    "set-and-forget": "npm run deploy:production && npm run self-healing:start",
+    "test": "vitest",
+    "lint": "eslint packages/*/src/**/*.js packages/*/src/**/*.ts",
+    "format": "prettier --write packages/*/src/**/*.{js,ts,tsx}"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240614.0",
+    "@types/node": "^20.14.0",
+    "eslint": "^9.5.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0",
+    "wrangler": "^4.105.0"
+  },
+  "dependencies": {
+    "itty-router": "^5.0.0",
+    "stripe": "^15.0.0",
+    "viem": "^2.0.0",
+    "zod": "^3.23.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "operating-system",
+    "control-plane",
+    "ai-agent",
+    "serverless",
+    "edge-native",
+    "orchestration",
+    "registry",
+    "discovery",
+    "trust",
+    "security",
+    "routing",
+    "analytics",
+    "self-healing",
+    "cloudflare-workers",
+    "wasm",
+    "x402"
+  ],
+  "author": "Davanzo Keoma",
+  "license": "MIT"
+}
