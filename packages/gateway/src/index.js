@@ -749,7 +749,7 @@ router.post('/mcp/message', async (request, env) => {
 // Install script
 router.get('/install', async () => {
   return new Response(
-    '#!/bin/bash\n# MetaMesh-UGA Install Script\necho "Installing MetaMesh-UGA..."\n# Download CLI\ncurl -L "https://github.com/metamesh-uga/gateway/releases/latest/download/metamesh-linux" -o metamesh\nchmod +x metamesh\nsudo mv metamesh /usr/local/bin/\necho "MetaMesh-UGA installed!"\necho "Run: metamesh connect"\n',
+    '#!/bin/bash\n# MetaMesh-UGA Install Script\necho "Installing MetaMesh-UGA..."\n# Download CLI\ncurl -L "https://github.com/SiouxTXT/metamesh-uga/releases/latest/download/metamesh-linux" -o metamesh\nchmod +x metamesh\nsudo mv metamesh /usr/local/bin/\necho "MetaMesh-UGA installed!"\necho "Run: metamesh connect"\n',
     {
       headers: {
         'Content-Type': 'text/x-shellscript',

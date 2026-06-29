@@ -62,7 +62,7 @@ report:
     search_engines_ready: true
     mcp_registry_registered: true
     mcp_registry_official: true
-    github_repository: "https://github.com/metamesh-uga/gateway"
+    github_repository: "https://github.com/SiouxTXT/metamesh-uga"
     
   next_steps:
     - "Monitor discovery automatico (ogni 6 ore)"

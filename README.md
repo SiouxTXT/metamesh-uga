@@ -55,7 +55,7 @@ Connect in seconds: point any MCP client (Claude, Windsurf, Cursor, Antigravity)
 ### 1. Clone e Setup
 
 ```bash
-git clone https://github.com/metamesh-uga/metamesh-uga.git
+git clone https://github.com/SiouxTXT/metamesh-uga.git
 cd metamesh-uga
 npm install
 ```

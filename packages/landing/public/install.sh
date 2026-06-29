@@ -8,7 +8,7 @@ set -e
 VERSION="1.0.0"
 INSTALL_DIR="/usr/local/bin"
 CLI_NAME="metamesh"
-REPO="https://github.com/metamesh-uga/cli"
+REPO="https://github.com/SiouxTXT/metamesh-uga"
 API_BASE="https://api.metamesh-uga.dev"
 
 # Colors

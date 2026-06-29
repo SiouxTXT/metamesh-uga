@@ -43,7 +43,7 @@ function App() {
               <a href="#connect" className="text-slate-400 hover:text-white transition-colors">Connect</a>
               <a href="https://dashboard.metamesh-uga.dev" className="text-slate-400 hover:text-white transition-colors">Dashboard</a>
               <a 
-                href="https://github.com/metamesh-uga/metamesh-uga" 
+                href="https://github.com/SiouxTXT/metamesh-uga" 
                 className="text-slate-400 hover:text-white transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -520,7 +520,7 @@ curl -X POST \\
             <div>
               <h4 className="font-semibold text-white mb-4">Connect</h4>
               <div className="flex gap-4">
-                <a href="https://github.com/metamesh-uga" className="hover:text-white">
+                <a href="https://github.com/SiouxTXT/metamesh-uga" className="hover:text-white">
                   <Github className="w-5 h-5" />
                 </a>
                 <a href="https://twitter.com/metamesh" className="hover:text-white">

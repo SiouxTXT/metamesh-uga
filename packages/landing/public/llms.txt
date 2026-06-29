@@ -39,4 +39,4 @@
 - Website: https://metamesh-uga.dev
 - Dashboard: https://dashboard.metamesh-uga.dev
 - Official MCP Registry: https://registry.modelcontextprotocol.io/?q=dev.metamesh-uga
-- Source: https://github.com/metamesh-uga/metamesh-uga
+- Source: https://github.com/SiouxTXT/metamesh-uga
