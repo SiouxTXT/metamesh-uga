@@ -113,6 +113,9 @@ X402_FACILITATOR_URL = "https://x402.org/facilitator"
 BILLING_ENABLED = "true"
 FREE_MONTHLY_CALLS = "100"
 PUBLIC_DASHBOARD_URL = "https://dashboard.metamesh-uga.dev"
+# God-mode: comma-separated list of agent_ids that bypass all billing (admin whitelist).
+# Set via: wrangler secret put ADMIN_AGENT_IDS --env production
+# Example: wrangler secret put ADMIN_AGENT_IDS --env production  (then paste: agent_abc123,agent_xyz789)
 # Secrets (set via: wrangler secret put <NAME> --env production):
 #   STRIPE_SECRET_KEY      (sk_live_... or sk_test_...)
 #   STRIPE_WEBHOOK_SECRET  (whsec_...)

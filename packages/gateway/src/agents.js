@@ -199,6 +199,14 @@ async function getToolPriceUsd(env, toolName) {
 
 const DEFAULT_FREE_MONTHLY_CALLS = 100;
 
+// Admin whitelist: these agent_ids bypass all billing enforcement (god-mode).
+// Comma-separated list set via ADMIN_AGENT_IDS env var.
+function isAdminWhitelist(env, agentId) {
+  const list = env.ADMIN_AGENT_IDS || '';
+  if (!list) return false;
+  return list.split(',').map(s => s.trim()).includes(agentId);
+}
+
 function currentPeriod() {
   return new Date().toISOString().slice(0, 7); // YYYY-MM
 }
@@ -246,9 +254,14 @@ export async function enforceFreemium(env, { request, toolName }) {
     return { ok: true, payment: { method: 'free', reason: 'tool_not_priced' } };
   }
 
+  const agent = await authenticateAgent(env, request);
+  // God-mode: admin whitelist bypasses all billing.
+  if (agent && isAdminWhitelist(env, agent.agent_id)) {
+    return { ok: true, payment: { method: 'god-mode', agent_id: agent.agent_id } };
+  }
+
   const limit = Number(env.FREE_MONTHLY_CALLS || DEFAULT_FREE_MONTHLY_CALLS);
   const period = currentPeriod();
-  const agent = await authenticateAgent(env, request);
 
   if (agent && agent.suspended) {
     return { ok: false, status: 403, body: { error: `Agent suspended: ${agent.suspended_reason || 'contact support'}` } };
@@ -317,6 +330,11 @@ export async function debitAgentCredit(env, { request, toolName, agent: knownAge
   }
 
   const agent = knownAgent || await authenticateAgent(env, request);
+  // God-mode: admin whitelist bypasses all billing.
+  if (agent && isAdminWhitelist(env, agent.agent_id)) {
+    return { ok: true, payment: { method: 'god-mode', agent_id: agent.agent_id } };
+  }
+
   if (!agent) {
     return {
       ok: false,

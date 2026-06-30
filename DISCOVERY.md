@@ -25,7 +25,7 @@ Canonical identity:
 | **PulseMCP** (pulsemcp.com) | Auto-index from registry | ⏳ Auto-indexed | Claim listing: https://www.pulsemcp.com/ |
 | **mcp.so** | Auto-index from registry / submit | ⏳ Auto-indexed | Submit/claim: https://mcp.so/submit |
 | **Smithery** (smithery.ai) | `smithery` CLI publish | ☐ TODO (needs Smithery login) | `smithery mcp publish https://api.metamesh-uga.dev/mcp -n metamesh-uga/metamesh-uga` |
-| **Awesome MCP Servers** (punkpeye/awesome-mcp-servers) | GitHub PR | ✅ PR opened | https://github.com/punkpeye/awesome-mcp-servers/pull/8975 (awaiting merge) |
+| **Awesome MCP Servers** (punkpeye/awesome-mcp-servers) | GitHub PR | ⏳ Awaiting Glama badge | https://github.com/punkpeye/awesome-mcp-servers/pull/8975 — **Action required**: submit to Glama (https://glama.ai/mcp/servers), get score badge, then add `[![SiouxTXT/metamesh-uga MCP server](https://glama.ai/mcp/servers/SiouxTXT/metamesh-uga/badges/score.svg)](https://glama.ai/mcp/servers/SiouxTXT/metamesh-uga)` to the PR |
 | **Cline MCP Marketplace** (cline/mcp-marketplace) | GitHub issue (form) | ⏳ Prepped | `llms-install.md` added. Open issue: https://github.com/cline/mcp-marketplace/issues/new?template=mcp-server-submission.yml — **attach a 400×400 PNG logo** + paste repo URL & reason |
 | **modelcontextprotocol/servers** (community list) | GitHub PR | ☐ TODO | PR to the community servers README |
 
