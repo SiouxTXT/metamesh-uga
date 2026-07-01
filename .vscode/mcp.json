@@ -1,0 +1,13 @@
+{
+  "servers": {
+    "metamesh-uga": {
+      "type": "http",
+      "url": "https://api.metamesh-uga.dev/mcp",
+      "description": "MetaMesh-UGA Universal Gateway Adapter - accesso a 13,290+ MCP tools serverless edge-native",
+      "headers": {
+        "X-Agent-Id": "agent_cd394a6bcf0a441292869eb8f283c58e",
+        "X-Agent-Key": "ak_b568e89d77454f568b9e16a3bad486da"
+      }
+    }
+  }
+}

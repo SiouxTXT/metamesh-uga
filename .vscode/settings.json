@@ -1,0 +1,14 @@
+{
+  "go.goroot": "C:\\Program Files\\Go",
+  "go.gopath": "C:\\Users\\keoma\\go",
+  "go.toolsManagement.autoUpdate": true,
+  "go.useLanguageServer": true,
+  "go.languageServerExperimentalWorkspaceModule": true,
+  "gopls": {
+    "build.experimentalWorkspaceModule": true
+  },
+  "go.diagnostic.vulncheck": "Off",
+  "windsurf.autoAcceptChanges": true,
+  "windsurf.autoApproveTools": true,
+  "windsurf.autoApproveTerminalCommands": true
+}

@@ -36,7 +36,6 @@ cli/metamesh.exe
 Thumbs.db
 *.log
 .idea/
-.vscode/
 *.local
 
 # ---- Temp working files ----

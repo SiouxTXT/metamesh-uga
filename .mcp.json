@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "metamesh-uga": {
+      "transport": {
+        "type": "http",
+        "url": "https://api.metamesh-uga.dev/mcp",
+        "headers": {
+          "X-Agent-Id": "agent_cd394a6bcf0a441292869eb8f283c58e",
+          "X-Agent-Key": "ak_b568e89d77454f568b9e16a3bad486da"
+        }
+      },
+      "capabilities": {
+        "tools": true,
+        "resources": false,
+        "prompts": false
+      }
+    }
+  }
+}
